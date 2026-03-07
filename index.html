@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Vịnh Hạ Long 9.2</title>
+    <style>
+        /* === TỔNG THỂ === */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 900px;
+            height: 600px;
+            background: #fff;
+            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 5px solid #334155;
+        }
+
+        .screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* --- MÀN HÌNH BẮT ĐẦU --- */
+        #start-screen {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2070&auto=format&fit=crop') center/cover;
+        }
+
+        /* SVG Chữ Cong - ĐÃ ĐIỀU CHỈNH KÍCH THƯỚC */
+        .curved-svg {
+            width: 850px; /* Nới rộng vùng chứa */
+            height: 300px;
+            filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.5));
+            margin-bottom: -30px;
+        }
+
+        .curved-svg text {
+            font-size: 38px; /* Giảm nhẹ cỡ chữ để không bị tràn */
+            font-weight: 900;
+            fill: #ffde59;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-btn {
+            padding: 15px 60px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #fff;
+            background: radial-gradient(circle, #60a5fa, #1e40af);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .play-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+        /* --- MÀN HÌNH BẢN ĐỒ --- */
+        #map-screen { 
+            background: url('https://via.placeholder.com/900x600/87CEEB/FFFFFF?text=[Bản+Đồ+Hạ+Long]') center/cover; 
+        }
+
+        .island-obj {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    /* Sử dụng tông màu xanh dương đậm (Royal Blue/Navy) */
+    background: radial-gradient(circle, #2563eb, #1e3a8a); 
+    border: 4px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+    animation: float 3s ease-in-out infinite;
+}
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .island-obj.solved { filter: grayscale(1); opacity: 0.6; pointer-events: none; }
+        .island-obj.solved::after { content: "✔️"; position: absolute; font-size: 28px; color: #fff; top: -5px; }
+
+        /* --- MÀN HÌNH CÂU HỎI --- */
+        #quiz-screen { background: #f1f5f9; padding: 20px; }
+        .img-wrapper { 
+            width: 500px; height: 300px; background: #cbd5e1; 
+            margin-bottom: 20px; border-radius: 15px; border: 5px solid #fff;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        #quiz-img { max-width: 100%; max-height: 100%; object-fit: cover; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 600px; }
+        .btn-choice { 
+            padding: 15px; background: #fff; border: 2px solid #3b82f6; border-radius: 12px; 
+            font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-choice:hover { background: #3b82f6; color: #fff; }
+
+        /* --- MÀN HÌNH KẾT THÚC --- */
+        #end-screen { background: #15803d; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="start-screen" class="screen active">
+            <svg class="curved-svg" viewBox="0 0 800 250">
+                <path id="curvePath" d="M50,200 Q400,20 750,200" fill="transparent" />
+                <text>
+                    <textPath xlink:href="#curvePath" startOffset="50%" text-anchor="middle">
+                        Khám phá Vịnh Hạ Long cùng 9.2
+                    </textPath>
+                </text>
+            </svg>
+            <button class="play-btn" onclick="startGame()">BẮT ĐẦU CHƠI</button>
+        </div>
+
+        <div id="map-screen" class="screen">
+            <div class="island-obj" id="island-0" style="top: 25%; left: 12%;" onclick="openQuiz(0)">1</div>
+            <div class="island-obj" id="island-1" style="top: 15%; left: 45%;" onclick="openQuiz(1)">2</div>
+            <div class="island-obj" id="island-2" style="top: 45%; left: 78%;" onclick="openQuiz(2)">3</div>
+            <div class="island-obj" id="island-3" style="top: 75%; left: 55%;" onclick="openQuiz(3)">4</div>
+            <div class="island-obj" id="island-4" style="top: 68%; left: 18%;" onclick="openQuiz(4)">5</div>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div class="img-wrapper">
+                <img id="quiz-img" src="" alt="Câu hỏi">
+            </div>
+            <div class="options-grid">
+                <button class="btn-choice" onclick="checkAnswer(0)"></button>
+                <button class="btn-choice" onclick="checkAnswer(1)"></button>
+                <button class="btn-choice" onclick="checkAnswer(2)"></button>
+                <button class="btn-choice" onclick="checkAnswer(3)"></button>
+            </div>
+            <p id="message" style="font-weight:bold; font-size:22px; height:30px;"></p>
+        </div>
+
+        <div id="end-screen" class="screen">
+            <h1>THÀNH CÔNG! 🎉</h1>
+            <p style="font-size: 24px;">Bạn đã chinh phục toàn bộ Vịnh Hạ Long cùng 9.2!</p>
+            <button class="play-btn" onclick="location.reload()">CHƠI LẠI</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { img: "https://via.placeholder.com/500x300/ff9900?text=[Hòn+Trống+Mái]", options: ["Hòn Trống Mái", "Hòn Đỉnh Hương", "Hòn Con Cóc", "Đảo Gà Chọi"], correct: 0 },
+            { img: "https://via.placeholder.com/500x300/00ccff?text=[Đảo+Ti+Tốp]", options: ["Đảo Tuần Châu", "Đảo Ti Tốp", "Đảo Cát Bà", "Đảo Quan Lạn"], correct: 1 },
+            { img: "https://via.placeholder.com/500x300/ff3300?text=[Hang+Sửng+Sốt]", options: ["Hang Luồn", "Động Thiên Cung", "Hang Đầu Gỗ", "Hang Sửng Sốt"], correct: 3 },
+            { img: "https://via.placeholder.com/500x300/33cc33?text=[Hòn+Đỉnh+Hương]", options: ["Hòn Đỉnh Hương", "Hòn Móng Tay", "Hòn Trống", "Hòn Mái"], correct: 0 },
+            { img: "https://via.placeholder.com/500x300/9933ff?text=[Vịnh+Hạ+Long]", options: ["Vịnh Lan Hạ", "Vịnh Bái Tử Long", "Vịnh Hạ Long", "Vịnh Cam Ranh"], correct: 2 }
+        ];
+
+        let solvedCount = 0;
+        let currentIdx = -1;
+        let isSolved = [false, false, false, false, false];
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startGame() { showScreen('map-screen'); }
+
+        function openQuiz(idx) {
+            currentIdx = idx;
+            const data = quizData[idx];
+            document.getElementById('quiz-img').src = data.img;
+            const btns = document.querySelectorAll('.btn-choice');
+            btns.forEach((btn, i) => {
+                btn.innerText = data.options[i];
+                btn.style.background = "white";
+                btn.disabled = false;
+            });
+            document.getElementById('message').innerText = "";
+            showScreen('quiz-screen');
+        }
+
+        function checkAnswer(selected) {
+            const data = quizData[currentIdx];
+            const msg = document.getElementById('message');
+            const btns = document.querySelectorAll('.btn-choice');
+            
+            if (selected === data.correct) {
+                msg.innerText = "ĐÚNG RỒI! 🎉";
+                msg.style.color = "green";
+                btns[selected].style.background = "#4ade80";
+                
+                if (!isSolved[currentIdx]) {
+                    isSolved[currentIdx] = true;
+                    solvedCount++;
+                    document.getElementById(`island-${currentIdx}`).classList.add('solved');
+                }
+
+                setTimeout(() => {
+                    if (solvedCount === 5) showScreen('end-screen');
+                    else showScreen('map-screen');
+                }, 1000);
+            } else {
+                msg.innerText = "SAI RỒI! ❌";
+                msg.style.color = "red";
+                btns[selected].style.background = "#fca5a5";
+                setTimeout(() => showScreen('map-screen'), 1200);
+            }
+        }
+    </script>
+</body>
+</html>
+
+
