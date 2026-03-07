@@ -25,6 +25,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 5px solid #334155;
+            overflow: hidden; /* Thêm để bo góc mượt hơn */
         }
 
         .screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
@@ -32,24 +33,25 @@
 
         /* --- MÀN HÌNH BẮT ĐẦU --- */
         #start-screen {
+            /* THAY ẢNH NỀN BẮT ĐẦU Ở ĐÂY */
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
-                        url('https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2070&auto=format&fit=crop') center/cover;
+                        url('anh-nen-start.jpg') center/cover;
         }
 
-        /* SVG Chữ Cong - ĐÃ ĐIỀU CHỈNH KÍCH THƯỚC */
+        /* SVG Chữ Cong - ĐÃ SỬA LỖI HIỂN THỊ */
         .curved-svg {
-            width: 850px; /* Nới rộng vùng chứa */
-            height: 300px;
-            filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.5));
-            margin-bottom: -30px;
+            width: 100%;
+            height: 250px;
+            filter: drop-shadow(3px 5px 2px rgba(0,0,0,0.8));
+            margin-bottom: 20px;
         }
 
         .curved-svg text {
-            font-size: 38px; /* Giảm nhẹ cỡ chữ để không bị tràn */
+            font-size: 34px; /* Chỉnh nhỏ lại một chút để vừa vặn câu dài */
             font-weight: 900;
             fill: #ffde59;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         .play-btn {
@@ -68,27 +70,28 @@
 
         /* --- MÀN HÌNH BẢN ĐỒ --- */
         #map-screen { 
-            background: url('https://via.placeholder.com/900x600/87CEEB/FFFFFF?text=[Bản+Đồ+Hạ+Long]') center/cover; 
+            /* THAY ẢNH NỀN BẢN ĐỒ Ở ĐÂY */
+            background: url('anh-nen-map.jpg') center/cover; 
         }
 
+        /* CỤC XANH XANH CỦA BẠN (Giữ nguyên) */
         .island-obj {
-    position: absolute;
-    width: 70px;
-    height: 70px;
-    /* Sử dụng tông màu xanh dương đậm (Royal Blue/Navy) */
-    background: radial-gradient(circle, #2563eb, #1e3a8a); 
-    border: 4px solid white;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-    animation: float 3s ease-in-out infinite;
-}
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #2563eb, #1e3a8a); 
+            border: 4px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
@@ -105,7 +108,7 @@
             margin-bottom: 20px; border-radius: 15px; border: 5px solid #fff;
             display: flex; align-items: center; justify-content: center; overflow: hidden;
         }
-        #quiz-img { max-width: 100%; max-height: 100%; object-fit: cover; }
+        #quiz-img { width: 100%; height: 100%; object-fit: cover; }
 
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 600px; }
         .btn-choice { 
@@ -122,12 +125,13 @@
 
     <div id="game-container">
         <div id="start-screen" class="screen active">
-            <svg class="curved-svg" viewBox="0 0 800 250">
-                <path id="curvePath" d="M50,200 Q400,20 750,200" fill="transparent" />
+            <svg class="curved-svg" viewBox="0 0 1000 300">
+                <path id="curvePath" d="M50,250 Q500,40 950,250" fill="transparent" />
                 <text>
-    <textPath xlink:href="#curvePath" startOffset="50%" text-anchor="middle">
-        Khám phá Hạ Long Bay cùng 9.16 </textPath>
-</text>
+                    <textPath xlink:href="#curvePath" startOffset="50%" text-anchor="middle">
+                        Khám phá Vịnh Hạ Long cùng 9.16 nhé!
+                    </textPath>
+                </text>
             </svg>
             <button class="play-btn" onclick="startGame()">BẮT ĐẦU CHƠI</button>
         </div>
@@ -150,7 +154,7 @@
                 <button class="btn-choice" onclick="checkAnswer(2)"></button>
                 <button class="btn-choice" onclick="checkAnswer(3)"></button>
             </div>
-            <p id="message" style="font-weight:bold; font-size:22px; height:30px;"></p>
+            <p id="message" style="font-weight:bold; font-size:22px; height:30px; margin-top: 15px;"></p>
         </div>
 
         <div id="end-screen" class="screen">
@@ -161,12 +165,13 @@
     </div>
 
     <script>
+        // ĐÃ THAY BẰNG ẢNH CỦA BẠN (anh1.jpg, anh2.jpg...)
         const quizData = [
-            { img: "https://via.placeholder.com/500x300/ff9900?text=[Hòn+Trống+Mái]", options: ["Hòn Trống Mái", "Hòn Đỉnh Hương", "Hòn Con Cóc", "Đảo Gà Chọi"], correct: 0 },
-            { img: "https://via.placeholder.com/500x300/00ccff?text=[Đảo+Ti+Tốp]", options: ["Đảo Tuần Châu", "Đảo Ti Tốp", "Đảo Cát Bà", "Đảo Quan Lạn"], correct: 1 },
-            { img: "https://via.placeholder.com/500x300/ff3300?text=[Hang+Sửng+Sốt]", options: ["Hang Luồn", "Động Thiên Cung", "Hang Đầu Gỗ", "Hang Sửng Sốt"], correct: 3 },
-            { img: "https://via.placeholder.com/500x300/33cc33?text=[Hòn+Đỉnh+Hương]", options: ["Hòn Đỉnh Hương", "Hòn Móng Tay", "Hòn Trống", "Hòn Mái"], correct: 0 },
-            { img: "https://via.placeholder.com/500x300/9933ff?text=[Vịnh+Hạ+Long]", options: ["Vịnh Lan Hạ", "Vịnh Bái Tử Long", "Vịnh Hạ Long", "Vịnh Cam Ranh"], correct: 2 }
+            { img: "anh1.jpg", options: ["Hòn Trống Mái", "Hòn Đỉnh Hương", "Hòn Con Cóc", "Đảo Gà Chọi"], correct: 0 },
+            { img: "anh2.jpg", options: ["Đảo Tuần Châu", "Đảo Ti Tốp", "Đảo Cát Bà", "Đảo Quan Lạn"], correct: 1 },
+            { img: "anh3.jpg", options: ["Hang Luồn", "Động Thiên Cung", "Hang Đầu Gỗ", "Hang Sửng Sốt"], correct: 3 },
+            { img: "anh4.jpg", options: ["Hòn Đỉnh Hương", "Hòn Móng Tay", "Hòn Trống", "Hòn Mái"], correct: 0 },
+            { img: "anh5.jpg", options: ["Vịnh Lan Hạ", "Vịnh Bái Tử Long", "Vịnh Hạ Long", "Vịnh Cam Ranh"], correct: 2 }
         ];
 
         let solvedCount = 0;
@@ -199,6 +204,9 @@
             const msg = document.getElementById('message');
             const btns = document.querySelectorAll('.btn-choice');
             
+            // Khóa các nút sau khi chọn để tránh bấm nhiều lần
+            btns.forEach(btn => btn.disabled = true);
+            
             if (selected === data.correct) {
                 msg.innerText = "ĐÚNG RỒI! 🎉";
                 msg.style.color = "green";
@@ -213,7 +221,7 @@
                 setTimeout(() => {
                     if (solvedCount === 5) showScreen('end-screen');
                     else showScreen('map-screen');
-                }, 1000);
+                }, 1200);
             } else {
                 msg.innerText = "SAI RỒI! ❌";
                 msg.style.color = "red";
@@ -224,5 +232,3 @@
     </script>
 </body>
 </html>
-
-
